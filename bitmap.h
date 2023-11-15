@@ -15,7 +15,10 @@ void Bitmap_init(Bitmap *map, uint8_t *data, int bits);
 void Bitmap_setBit(Bitmap *bitmap, int bit);
 
 // Imposta il bit specificato nella bitmap a 0 (libero)
-void clearBit(Bitmap *bitmap, int bit);
+void Bitmap_clearBit(Bitmap *bitmap, int bit);
 
 // Verifica lo stato del bit specificato
-int testBit(Bitmap *bitmap, int bit);
+int Bitmap_testBit(Bitmap *bitmap, int bit);
+
+// Trova l'indice del primo blocco libero
+int Bitmap_findFreeIndex(Bitmap *bitmap);
