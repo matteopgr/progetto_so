@@ -4,7 +4,7 @@ const char *PoolAllocator_strerrors[] = {"Success", "NotEnoughMemory", "Unaligne
 
 const char *PoolAllocator_strerror(PoolAllocatorResult result)
 {
-    return PoolAllocator_strerrors[result];
+    return PoolAllocator_strerrors[-result];
 }
 
 PoolAllocatorResult PoolAllocator_init(PoolAllocator *allocator, int item_size, int num_items, char *memory_block, int memory_size)
