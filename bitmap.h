@@ -1,7 +1,9 @@
+#pragma once
+
 #include <stdlib.h>
 #include <stdint.h>
 
-typedef struct
+typedef struct Bitmap
 {
     uint8_t *data; // Array di byte che rappresenta la bitmap
     int data_size; // Dimensione dell'array in bytes
