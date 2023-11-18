@@ -1,13 +1,13 @@
 CC=gcc
 CCOPTS= --std=gnu99 -Wall
 
-OBJS=bitmap.o
+OBJS=bitmap.o buddy_allocator.o
 
 LIBS=lib.a
 
-HEADERS=bitmap.h
+HEADERS=bitmap.h buddy_allocator.h
 
-BINS=bitmap_test
+BINS=bitmap_test buddy_allocator_test
 
 all:	$(LIBS) $(BINS)
 
@@ -20,6 +20,9 @@ lib.a:	$(OBJS)
 
 bitmap_test:	bitmap_test.o $(LIBS)
 				$(CC) $(CCOPTS) -o $@ $^
+
+buddy_allocator_test:	buddy_allocator_test.o $(LIBS) 
+						$(CC) $(CCOPTS) -o $@ $^ -lm
 
 clean:
 	rm -rf *.o *~ $(BINS) $(LIBS)

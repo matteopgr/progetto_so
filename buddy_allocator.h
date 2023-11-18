@@ -19,3 +19,5 @@ int BuddyAllocator_getBuddy(BuddyAllocator *alloc, int level);
 void BuddyAllocator_releaseBuddy(BuddyAllocator *alloc, int idx);
 
 void *BuddyAllocator_malloc(BuddyAllocator *alloc, int size);
+
+void BuddyAllocator_free(BuddyAllocator *alloc, void *mem);

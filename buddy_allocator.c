@@ -28,13 +28,22 @@ int parent_idx(int idx)
     return idx / 2;
 }
 
+void set_parent(Bitmap *map, int idx)
+{
+    if (!idx)
+        return;
+    Bitmap_setBit(map, idx);
+    set_parent(map, parent_idx(idx));
+    printf("Split lvl %d idx: %d\n", levelIdx(idx), idx);
+}
+
 // cerca il primo blocco libero nel livello
 int free_level_idx(BuddyAllocator *alloc, int lvl)
 {
     int start = first_level_index(lvl);
-    int end = first_level_index(lvl + 1) - 1;
+    int end = first_level_index(lvl + 1);
 
-    for (int i = start; i <= end; i++)
+    for (int i = start; i < end; i++)
     {
         if (!Bitmap_testBit(alloc->bitmap, i))
             return i;
@@ -59,28 +68,26 @@ int BuddyAllocator_getBuddy(BuddyAllocator *alloc, int level)
     int idx = free_level_idx(alloc, level);
     if (idx != -1)
     {
+        int parent = parent_idx(idx);
+        if (Bitmap_testBit(alloc->bitmap, parent))
+        {
+            Bitmap_setBit(alloc->bitmap, idx);
+            printf("Requested buddy idx: %d, level: %d\n", idx, levelIdx(idx));
+            return idx;
+        }
+        set_parent(alloc->bitmap, parent);
         Bitmap_setBit(alloc->bitmap, idx);
+        printf("Requested buddy idx: %d, level: %d\n", idx, levelIdx(idx));
         return idx;
     }
-
-    // cerco ricorsivamente un blocco libero al livello superiore
-    int parent = BuddyAllocator_findBuddy(alloc, level - 1);
-
-    // livello non trovato
-    if (parent == -1)
-        return -1;
-
-    int left_idx = parent * 2;
-
-    Bitmap_setBit(alloc->bitmap, left_idx);
-    return left_idx;
+    return -1;
 }
 
 void BuddyAllocator_releaseBuddy(BuddyAllocator *alloc, int idx)
 {
-    if (idx < 0 || idx > (1 << alloc->num_levels) - 1)
+    if (idx < 0 || idx > (1 << (alloc->num_levels + 1)))
     {
-        printf("Invalid index\n");
+        printf("Error Release: Invalid index\n");
         return;
     }
     Bitmap_clearBit(alloc->bitmap, idx);
@@ -93,30 +100,61 @@ void BuddyAllocator_releaseBuddy(BuddyAllocator *alloc, int idx)
 
     if (!Bitmap_testBit(alloc->bitmap, buddy_idx))
     {
-        printf("Merge %d with %d", idx > buddy_idx ? buddy_idx : idx, idx > buddy_idx ? idx : buddy_idx);
-        Bitmap_clearBit(alloc->bitmap, buddy_idx);
+        int mem_size = (1 << alloc->num_levels) * (alloc->min_bucket_size + 4);
+        int level = levelIdx(idx);
+        int buddy_size = mem_size / (1 << level);
+        printf("Merge lvl %d buddies %d - %d, size: %d\n", levelIdx(idx), idx > buddy_idx ? buddy_idx : idx, idx > buddy_idx ? idx : buddy_idx, buddy_size);
         BuddyAllocator_releaseBuddy(alloc, parent_idx);
     }
 }
 
 void *BuddyAllocator_malloc(BuddyAllocator *alloc, int size)
 {
-    int mem_size = 1 << alloc->num_levels * (alloc->min_bucket_size + 4);
+    int mem_size = (1 << alloc->num_levels) * (alloc->min_bucket_size + 4);
 
-    assert(size <= mem_size);
+    assert(size <= mem_size && "Not enaugh memory\n");
 
-    int level = floor(log(mem_size / size));
+    int level = (int)floor(log2(mem_size / size));
     if (level > alloc->num_levels)
         level = alloc->num_levels;
     printf("Requested %d bytes of memory, level %d\n", size, level);
 
     int idx = BuddyAllocator_getBuddy(alloc, level);
+    if (idx == -1)
+    {
+        printf("Malloc Error: Not enough memory\n");
+        return 0;
+    }
     int offset = idx_offset(idx);
     int buddy_size = mem_size / (1 << level);
 
     char *address = alloc->memory + buddy_size * offset;
 
-    char **start = address;
+    int *start = (int *)address;
     *start = idx;
-    return start + 4;
+    printf("Done malloc start: %p, end: %p\n", start + 1, (start + 1 + buddy_size / 4) - 1);
+    return start + 1;
+}
+
+void BuddyAllocator_free(BuddyAllocator *alloc, void *mem)
+{
+    if (!mem)
+    {
+        printf("Error Free: Memory not allocated\n");
+        return;
+    }
+    printf("Free %p\n", mem);
+    int *i = (int *)mem - 1;
+    int idx = *i;
+    int mem_size = (1 << alloc->num_levels) * (alloc->min_bucket_size + 4);
+    int level = levelIdx(idx);
+    int buddy_size = mem_size / (1 << level);
+    printf("Free idx %d,level: %d, size: %d\n", idx, level, buddy_size);
+    if (idx < 0 || idx > (1 << (alloc->num_levels + 1)))
+    {
+        printf("Error: Free %p -> Invalid index\n", mem);
+        return;
+    }
+    BuddyAllocator_releaseBuddy(alloc, idx);
+    printf("Done free\n");
 }
