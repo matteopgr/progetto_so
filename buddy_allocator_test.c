@@ -22,11 +22,21 @@ int main(int argc, char const *argv[])
 
     printf("Requesting memory\n");
 
+    void *p0 = BuddyAllocator_malloc(&alloc, MEM_SIZE + 1);
     void *p1 = BuddyAllocator_malloc(&alloc, 1000);
     void *p2 = BuddyAllocator_malloc(&alloc, MIN_BUCKET_SIZE);
     void *p3 = BuddyAllocator_malloc(&alloc, 2 * MIN_BUCKET_SIZE);
     void *p4 = BuddyAllocator_malloc(&alloc, MEM_SIZE / 2);
     void *p5 = BuddyAllocator_malloc(&alloc, MEM_SIZE / 2);
+    void *p6 = BuddyAllocator_malloc(&alloc, MEM_SIZE / 4);
+    void *p7 = BuddyAllocator_malloc(&alloc, MEM_SIZE / 4);
+    void *p8 = BuddyAllocator_malloc(&alloc, 1);
+
+    /*     for (int i = 0; i < bitmap.bits; i++)
+        {
+            if (Bitmap_testBit(&bitmap, i))
+                printf("Bit %d taken\n", i);
+        } */
 
     printf("Releasing memory\n");
     BuddyAllocator_free(&alloc, p1);
@@ -34,6 +44,9 @@ int main(int argc, char const *argv[])
     BuddyAllocator_free(&alloc, p3);
     BuddyAllocator_free(&alloc, p4);
     BuddyAllocator_free(&alloc, p5);
+    BuddyAllocator_free(&alloc, p6);
+    BuddyAllocator_free(&alloc, p7);
+    BuddyAllocator_free(&alloc, p8);
 
     printf("End\n");
 }
