@@ -95,14 +95,11 @@ int BuddyAllocator_getBuddy(BuddyAllocator *alloc, int level)
         int parent = parent_idx(idx);
         if (Bitmap_testBit(alloc->bitmap, parent))
         {
-            printf("Setting children\n");
             set_children(alloc->bitmap, idx);
             printf("Requested buddy idx: %d, level: %d\n", idx, levelIdx(idx));
             return idx;
         }
-        printf("Setting parent\n");
         set_parent(alloc->bitmap, parent);
-        printf("Setting children\n");
         set_children(alloc->bitmap, idx);
         printf("Requested buddy idx: %d, level: %d\n", idx, levelIdx(idx));
         return idx;
@@ -164,7 +161,7 @@ void *BuddyAllocator_malloc(BuddyAllocator *alloc, int size)
 
     int *start = (int *)address;
     *start = idx;
-    printf("Done malloc start: %p, end: %p\n", start + 1, (start + 1 + buddy_size / 4) - 1);
+    printf("Done malloc idx: %d start: %p, end: %p\n", idx, start + 1, (start + 1 + buddy_size / 4) - 1);
     return start + 1;
 }
 

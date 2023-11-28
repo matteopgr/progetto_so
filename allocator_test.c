@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include "allocator.h"
+
+#define NUM_LVL 9
+#define MEM_SIZE 1024 * 1024
+#define MIN_BUCKET_SIZE (MEM_SIZE >> (NUM_LVL))
+#define BUFFER_SIZE 1 << (NUM_LVL + 1)
+#define POOL_SIZE 102400
+
+BuddyAllocator buddy;
+Bitmap bitmap;
+Allocator alloc;
+
+char pool_buffer[POOL_SIZE];
+uint8_t buffer[((BUFFER_SIZE) + 7) / 8] = {0};
+char memory[MEM_SIZE];
+
+int main(int argc, char const *argv[])
+{
+    printf("Creating bitmap\n");
+    Bitmap_init(&bitmap, buffer, BUFFER_SIZE);
+    printf("Done, num bits: %d\n", bitmap.bits);
+
+    printf("Creating Buddy allocator: %d levels\n", NUM_LVL);
+    BuddyAllocator_init(&buddy, NUM_LVL, &bitmap, memory, MIN_BUCKET_SIZE);
+    printf("Done, memory size: %d, min bucket size: %d\n", MEM_SIZE, MIN_BUCKET_SIZE);
+
+    printf("Creating allocator\n");
+    Allocator_init(&alloc, buddy, pool_buffer);
+    printf("Done\n");
+
+    printf("Requesting memory\n");
+
+    void *p1 = Allocator_malloc(&alloc, (MEM_SIZE - 1) / 2);
+    void *p3 = Allocator_malloc(&alloc, (MEM_SIZE - 1) / 2);
+    int size = (1 << alloc.buddy.num_levels) * (alloc.buddy.min_bucket_size + 4);
+    printf("start: %p - end: %p\n", alloc.buddy.memory, alloc.buddy.memory + size);
+    int *p2 = (int *)Allocator_malloc(&alloc, PAGE_SIZE / 3);
+    printf("p2: %p\n", p2);
+    printf("Num allocations %d\n", alloc.num_allocations);
+    Allocator_free(&alloc, p1);
+    Allocator_free(&alloc, p2);
+    Allocator_free(&alloc, p3);
+}
