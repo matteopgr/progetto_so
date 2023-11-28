@@ -161,7 +161,7 @@ void *BuddyAllocator_malloc(BuddyAllocator *alloc, int size)
 
     int *start = (int *)address;
     *start = idx;
-    printf("Done malloc idx: %d start: %p, end: %p\n", idx, start + 1, (start + 1 + buddy_size / 4) - 1);
+    printf("Done buddy malloc idx: %d start: %p, end: %p\n", idx, start + 1, (start + 1 + buddy_size / 4) - 1);
     return start + 1;
 }
 
@@ -185,5 +185,5 @@ void BuddyAllocator_free(BuddyAllocator *alloc, void *mem)
         return;
     }
     BuddyAllocator_releaseBuddy(alloc, idx);
-    printf("Done free\n");
+    printf("Done buddy free\n");
 }

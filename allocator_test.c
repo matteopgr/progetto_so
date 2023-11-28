@@ -45,4 +45,6 @@ int main(int argc, char const *argv[])
     Allocator_free(&alloc, p4);
 
     printf("Num allocations %d\n", alloc.num_allocations);
+
+    printf("End\n");
 }

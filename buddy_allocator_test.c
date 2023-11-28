@@ -39,6 +39,7 @@ int main(int argc, char const *argv[])
         } */
 
     printf("Releasing memory\n");
+    BuddyAllocator_free(&alloc, p0);
     BuddyAllocator_free(&alloc, p1);
     BuddyAllocator_free(&alloc, p2);
     BuddyAllocator_free(&alloc, p3);
