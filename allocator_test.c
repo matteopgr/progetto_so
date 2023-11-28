@@ -33,12 +33,16 @@ int main(int argc, char const *argv[])
 
     void *p1 = Allocator_malloc(&alloc, (MEM_SIZE - 1) / 2);
     void *p3 = Allocator_malloc(&alloc, (MEM_SIZE - 1) / 2);
-    int size = (1 << alloc.buddy.num_levels) * (alloc.buddy.min_bucket_size + 4);
-    printf("start: %p - end: %p\n", alloc.buddy.memory, alloc.buddy.memory + size);
-    int *p2 = (int *)Allocator_malloc(&alloc, PAGE_SIZE / 3);
-    printf("p2: %p\n", p2);
+    void *p2 = Allocator_malloc(&alloc, PAGE_SIZE / 3);
+    void *p4 = Allocator_malloc(&alloc, PAGE_SIZE / 2);
+
     printf("Num allocations %d\n", alloc.num_allocations);
+    printf("Releasing memory\n");
+
     Allocator_free(&alloc, p1);
     Allocator_free(&alloc, p2);
     Allocator_free(&alloc, p3);
+    Allocator_free(&alloc, p4);
+
+    printf("Num allocations %d\n", alloc.num_allocations);
 }

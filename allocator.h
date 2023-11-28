@@ -13,7 +13,7 @@ typedef struct Allocator
 {
     BuddyAllocator buddy; // Buddy allocator needed for small allocations
     PoolAllocator pool;   // Pool allocator for allocations info
-    int num_allocations;  // Number of allocations using mmap
+    int num_allocations;  // Number of allocations
     ListHead allocations; // List of allocations using mmap
 } Allocator;
 

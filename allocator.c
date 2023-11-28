@@ -5,12 +5,12 @@
 
 AllocationInfo *findAllocationFromAddress(Allocator *alloc, char *address)
 {
+    printf("Searching allocation info for %p\n", address);
     ListItem *aux = alloc->allocations.first;
 
     while (aux)
     {
         AllocationInfo *info = (AllocationInfo *)aux;
-        printf("Info: %p - mem: %p\n", info->mem, address);
         if (info->mem == address)
         {
             printf("Found allocation info for %p\n", info->mem);
@@ -30,8 +30,6 @@ AllocationInfo *createAllocationInfo(Allocator *alloc, char *mem, int size)
     info->size = size;
     List_pushFront(&alloc->allocations, (ListItem *)info);
     alloc->num_allocations++;
-    AllocationInfo *test = (AllocationInfo *)alloc->allocations.first;
-    printf("List size test %d\n", alloc->allocations.size);
     printf("Creating allocation info for %p - size %d\n", info->mem, info->size);
     return info;
 }
@@ -73,6 +71,7 @@ void *Allocator_malloc(Allocator *alloc, int size)
             return 0;
         }
         printf("Malloc success buddy\n");
+        alloc->num_allocations++;
         return mem;
     }
     else
@@ -99,6 +98,7 @@ void Allocator_free(Allocator *alloc, void *mem)
     {
         printf("Memory address is inside buddy allocator\n");
         BuddyAllocator_free(&alloc->buddy, mem);
+        alloc->num_allocations--;
     }
     else
     {
@@ -117,6 +117,6 @@ void Allocator_free(Allocator *alloc, void *mem)
             printf("Error Free mmap: %s\n", strerror(errno));
             return;
         }
-        printf("Done munmap\n");
+        printf("Done unmapping\n");
     }
 }
