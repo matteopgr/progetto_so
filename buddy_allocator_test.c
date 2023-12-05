@@ -32,12 +32,6 @@ int main(int argc, char const *argv[])
     void *p7 = BuddyAllocator_malloc(&alloc, MEM_SIZE / 4);
     void *p8 = BuddyAllocator_malloc(&alloc, 1);
 
-    /*     for (int i = 0; i < bitmap.bits; i++)
-        {
-            if (Bitmap_testBit(&bitmap, i))
-                printf("Bit %d taken\n", i);
-        } */
-
     printf("Releasing memory\n");
     BuddyAllocator_free(&alloc, p0);
     BuddyAllocator_free(&alloc, p1);

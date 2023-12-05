@@ -5,7 +5,7 @@
 #define MEM_SIZE 1024 * 1024
 #define MIN_BUCKET_SIZE (MEM_SIZE >> (NUM_LVL))
 #define BUFFER_SIZE 1 << (NUM_LVL + 1)
-#define POOL_SIZE 102400
+#define POOL_SIZE MAX_ALLOCATIONS * (sizeof(AllocationInfo) + sizeof(int))
 
 BuddyAllocator buddy;
 Bitmap bitmap;

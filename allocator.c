@@ -13,7 +13,7 @@ AllocationInfo *findAllocationFromAddress(Allocator *alloc, char *address)
         AllocationInfo *info = (AllocationInfo *)aux;
         if (info->mem == address)
         {
-            printf("Found allocation info for %p\n", info->mem);
+            printf("Found allocation info for %p - size %d\n", info->mem, info->size);
             return info;
         }
         aux = aux->next;
