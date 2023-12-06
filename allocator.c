@@ -67,8 +67,16 @@ void *Allocator_malloc(Allocator *alloc, int size)
         char *mem = (char *)BuddyAllocator_malloc(&alloc->buddy, size);
         if (!mem)
         {
-            printf("Error Malloc buddy\n");
-            return 0;
+            printf("Malloc buddy allocator has not enough memory - using mmap\n");
+            mem = (char *)mmap(NULL, size, PROT_WRITE | PROT_READ, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+            if (mem == MAP_FAILED)
+            {
+                printf("Error Malloc mmap: %s\n", strerror(errno));
+                return 0;
+            }
+            AllocationInfo *info = createAllocationInfo(alloc, mem, size);
+            printf("Malloc success mmap - start %p end %p\n", info->mem, info->mem + size - 1);
+            return mem;
         }
         printf("Malloc success buddy\n");
         alloc->num_allocations++;

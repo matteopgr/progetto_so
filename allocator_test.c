@@ -31,10 +31,11 @@ int main(int argc, char const *argv[])
 
     printf("Requesting memory\n");
 
-    void *p1 = Allocator_malloc(&alloc, (MEM_SIZE - 1) / 2);
+    void *p1 = Allocator_malloc(&alloc, (MEM_SIZE - 1));
     void *p3 = Allocator_malloc(&alloc, (MEM_SIZE - 1) / 2);
     void *p2 = Allocator_malloc(&alloc, PAGE_SIZE / 3);
     void *p4 = Allocator_malloc(&alloc, PAGE_SIZE / 2);
+    void *p5 = Allocator_malloc(&alloc, sizeof(int));
 
     printf("Num allocations %d\n", alloc.num_allocations);
     printf("Releasing memory\n");
@@ -43,6 +44,7 @@ int main(int argc, char const *argv[])
     Allocator_free(&alloc, p2);
     Allocator_free(&alloc, p3);
     Allocator_free(&alloc, p4);
+    Allocator_free(&alloc, p5);
 
     printf("Num allocations %d\n", alloc.num_allocations);
 
